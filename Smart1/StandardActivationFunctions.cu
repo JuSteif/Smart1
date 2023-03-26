@@ -1,11 +1,4 @@
-#include <cuda.h>
-#include <cuda_runtime.h>
-
-#include <math.h>
-
-#define SIGMOID_FUNCTION 0
-#define LINEAR_FUNCTION 1
-#define STEP_FUNCTION 2
+#include "StandardActivationFunctions.cuh"
 
 __device__ float sigmoid(float net) {
 	return 1.0f / (1.0f + exp(-net));
