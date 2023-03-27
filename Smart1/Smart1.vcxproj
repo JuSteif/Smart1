@@ -79,11 +79,9 @@
   <ItemGroup>
     <CudaCompile Include="kernel.cu" />
     <CudaCompile Include="Matrix.cu" />
-    <CudaCompile Include="StandardActivationFunctions.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrix.cuh" />
-    <ClInclude Include="StandardActivationFunctions.cuh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

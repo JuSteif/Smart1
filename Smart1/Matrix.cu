@@ -1,5 +1,34 @@
 #include "Matrix.cuh"
 
+#pragma region ACTIVATION_FUNCTIONS
+
+__device__ float sigmoid(float net) {
+	return 1.0f / (1.0f + exp(-net));
+}
+
+__device__ float sigmoidDerivative(float out) {
+	return out * (1 - out);
+}
+
+__device__ float step(float net) {
+	if (net > 0.5) return 1;
+	else return 0;
+}
+
+__device__ float stepDerivative(float out) {
+	return 1;
+}
+
+__device__ float linear(float net) {
+	return net;
+}
+
+__device__ float linearDerivative(float out) {
+	return 1;
+}
+
+#pragma endregion
+
 __global__ void multplyMatricesAndActivate(float* A, float* B, float* C, int widthA, int widthB, int heightA, int heightB, uint8_t activatioonFunction) {
 	int idx = threadIdx.x + blockIdx.x * blockDim.x;
 	float* pA = &A[idx / widthB];
@@ -34,6 +63,10 @@ int Matrix::copyMatrixToDevice() {
 
 int Matrix::copyMatrixToHost() {
 	return cudaMemcpy(dataHost, dataDevice, width * height * sizeof(float), cudaMemcpyDeviceToHost);
+}
+
+Matrix::Matrix() {
+
 }
 
 Matrix::Matrix(int width, int height, int* errorStatus, uint8_t method, float seed) : height(height), width(width) {
@@ -111,7 +144,7 @@ Matrix Matrix::operator * (Matrix B) {
 	this->copyMatrixToDevice();
 	B.copyMatrixToDevice();
 
-	multplyMatricesAndActivate << <B.getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >> > (this->dataDevice, B.dataDevice, result.dataDevice, this->getWidth(), B.getWidth(), this->getHeight(), B.getHeight(), STEP_FUNCTION);
+	multplyMatricesAndActivate <<<B.getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (this->dataDevice, B.dataDevice, result.dataDevice, this->getWidth(), B.getWidth(), this->getHeight(), B.getHeight(), STEP_FUNCTION);
 
 	result.copyMatrixToHost();
 

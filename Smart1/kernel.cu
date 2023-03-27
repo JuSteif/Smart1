@@ -4,28 +4,52 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+class Layer {
+private:
+	bool outputNeuron;
+public:
+	Matrix Weights;
+	Matrix Outputs;
+	Matrix* Inputs;
+
+	Layer(int sizeInput, int sizeOutput, bool outputNeuron, Matrix *Inputs): outputNeuron(outputNeuron), Inputs(Inputs) {
+		int error;
+		Weights = Matrix(sizeInput, sizeOutput, &error, 2, 1);
+		if (error != cudaSuccess) return;
+	}
+
+	void deleteLayer() {
+		Weights.deleteMatrix();
+		Outputs.deleteMatrix();
+	}
+
+	void forward() {
+		Outputs = Weights * *Inputs;
+	}
+};
+
 int main(int argc, char** argv) {
 	int error;
-	Matrix A(10, 5, &error, 2, 0.1);
+	Matrix Inputs(1, 10, &error, 2, 0.00000001);
 	if (error != cudaSuccess) return;
-	Matrix B(1, 10, &error, 2, 1);
-	if (error != cudaSuccess) return;
+
+	Layer layer(10, 5, true, &Inputs);
+	
 
 	//*
-	A.printMatrix();
+	Inputs.printMatrix();
 	printf("\n");
-	B.printMatrix();
+	layer.Weights.printMatrix();
 	//*/
 
-	Matrix C = A * B;
+	layer.forward();
 	
-	printf("\nResult: %d\n", C.getHeight());
+	printf("\nResult: %d\n", layer.Outputs.getHeight());
 	//printf("Value: %f", C.getData(0, 0));
-	C.printMatrix();
+	layer.Outputs.printMatrix();
 
-	A.deleteMatrix();
-	B.deleteMatrix();
-	C.deleteMatrix();
+	Inputs.deleteMatrix();
+	layer.deleteLayer();
 
 	return 0;
 }
