@@ -1,55 +1,51 @@
 ﻿#include "Matrix.cuh"
+#include "Layer.h"
+#include "Network.h"
 
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-
-class Layer {
-private:
-	bool outputNeuron;
-public:
-	Matrix Weights;
-	Matrix Outputs;
-	Matrix* Inputs;
-
-	Layer(int sizeInput, int sizeOutput, bool outputNeuron, Matrix *Inputs): outputNeuron(outputNeuron), Inputs(Inputs) {
-		int error;
-		Weights = Matrix(sizeInput, sizeOutput, &error, 2, 1);
-		if (error != cudaSuccess) return;
-	}
-
-	void deleteLayer() {
-		Weights.deleteMatrix();
-		Outputs.deleteMatrix();
-	}
-
-	void forward() {
-		Outputs = Weights * *Inputs;
-	}
-};
+#include <vector>
 
 int main(int argc, char** argv) {
-	int error;
-	Matrix Inputs(1, 10, &error, 2, 0.00000001);
-	if (error != cudaSuccess) return;
 
-	Layer layer(10, 5, true, &Inputs);
+	Network network(2);
+
+	network.addLayer(1);
 	
+	network.prepareNetwork();
+	
+	network.forward();
 
 	//*
-	Inputs.printMatrix();
-	printf("\n");
-	layer.Weights.printMatrix();
+	printf("Inputs:\n");
+	network.Inputs.printMatrix();
+	printf("\nWeights:\n");
+	network.printNetwork();
+	
+	printf("\nOutputs:\n");
+	network.getNetworkOutput()->printMatrix();
 	//*/
 
-	layer.forward();
-	
-	printf("\nResult: %d\n", layer.Outputs.getHeight());
-	//printf("Value: %f", C.getData(0, 0));
-	layer.Outputs.printMatrix();
+	network.deleteNetwork();
 
-	Inputs.deleteMatrix();
-	layer.deleteLayer();
+
+	int error;
+	Matrix Ins(1, 2, &error, 2, 1);
+	Matrix Outs(1, 1, &error, 2, 1);
+	Layer layer = Layer(2, 1, true, &Ins, NULL, &Outs);
+
+	layer.forward();
+	layer.calculatErrorSignal();
+
+	printf("\nResult:\n");
+	layer.Outputs.printMatrix();
+	printf("\n___________________________________\nError:\n");
+	layer.ErrorSignal.printMatrix();
+
+	layer.calculateNewWeights(0.5);
+	printf("\n___________________________________\nnew Weights:\n");
+	layer.Weights.printMatrix();
 
 	return 0;
 }

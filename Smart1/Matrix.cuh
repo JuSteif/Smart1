@@ -14,7 +14,12 @@
 #define LINEAR_FUNCTION 1
 #define STEP_FUNCTION 2
 
-__global__ void multplyMatricesAndActivate(float* A, float* B, float* C, int widthA, int widthB, int heightA, int heightB, uint8_t activatioonFunction = SIGMOID_FUNCTION);
+__global__ void multplyMatrices(float* A, float* B, float* C, int widthA, int widthB, int heightA, int heightB);
+__global__ void activateMatrices(float* A, int widthA, int heightA, uint8_t activatioonFunction = SIGMOID_FUNCTION);
+__global__ void substractMatrices(float* A, float* B, float* C, int widthA, int heightA);
+__global__ void addMatrices(float* A, float* B, float* C, int widthA, int heightA);
+__global__ void multiplyWithDerivate(float* outputs, float* errorSignal, int sizeOutputs, uint8_t activatioonFunction = SIGMOID_FUNCTION);
+__global__ void calculateNewWeights(float* weights, float* Error, float* Inputs, int sizeError, int sizeInputs, float learnRate);
 
 class Matrix {
 private:
@@ -42,4 +47,8 @@ public:
 	void printMatrix();
 
 	Matrix operator * (Matrix B);
+	Matrix operator - (Matrix B);
+	Matrix operator + (Matrix B);
+	void multiplyWithDerivateMatrix(Matrix* errorSignal, int activationFunction = SIGMOID_FUNCTION);
+	void calculateNewWeightsMatrix(Matrix* Inputs, Matrix* Error, float learnRate);
 };

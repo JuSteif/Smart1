@@ -29,7 +29,7 @@ __device__ float linearDerivative(float out) {
 
 #pragma endregion
 
-__global__ void multplyMatricesAndActivate(float* A, float* B, float* C, int widthA, int widthB, int heightA, int heightB, uint8_t activatioonFunction) {
+__global__ void multplyMatrices(float* A, float* B, float* C, int widthA, int widthB, int heightA, int heightB) {
 	int idx = threadIdx.x + blockIdx.x * blockDim.x;
 	float* pA = &A[idx / widthB];
 	float* pB = &B[idx % widthB];
@@ -42,18 +42,67 @@ __global__ void multplyMatricesAndActivate(float* A, float* B, float* C, int wid
 			pB += widthB;
 		}
 
+		C[idx] = out;
+	}
+}
+
+__global__ void activateMatrices(float* A, int widthA, int heightA, uint8_t activatioonFunction) {
+	int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+	if (idx <= widthA * heightA) {
 		switch (activatioonFunction) {
 		case SIGMOID_FUNCTION:
-			out = sigmoid(out);
+			A[idx] = sigmoid(A[idx]);
 			break;
 		case STEP_FUNCTION:
-			out = step(out);
+			A[idx] = step(A[idx]);
 			break;
 		case LINEAR_FUNCTION:
-			out = linear(out);
+			A[idx] = linear(A[idx]);
 			break;
 		}
-		C[idx] = out;
+	}
+}
+
+__global__ void substractMatrices(float* A, float* B, float* C, int widthA, int heightA) {
+	int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+	if (idx <= widthA * heightA) {
+		C[idx] = A[idx] - B[idx];
+	}
+}
+
+__global__ void addMatrices(float* A, float* B, float* C, int widthA, int heightA) {
+	int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+	if (idx <= widthA * heightA) {
+		C[idx] = A[idx] + B[idx];
+	}
+}
+
+__global__ void multiplyWithDerivate(float* outputs, float* errorSignal, int sizeOutputs, uint8_t activatioonFunction) {
+	int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+	if (idx < sizeOutputs) {
+		switch (activatioonFunction) {
+		case SIGMOID_FUNCTION:
+			errorSignal[idx] *= sigmoidDerivative(outputs[idx]);
+			break;
+		case STEP_FUNCTION:
+			errorSignal[idx] *= stepDerivative(outputs[idx]);
+			break;
+		case LINEAR_FUNCTION:
+			errorSignal[idx] *= linearDerivative(outputs[idx]);
+			break;
+		}
+	}
+}
+
+__global__ void calculateNewWeights(float* weights, float* Error, float* Inputs, int sizeError, int sizeInputs, float learnRate) {
+	int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+	if (idx < sizeError * sizeInputs) {
+		weights[idx] += -learnRate * Error[idx / sizeInputs] * Inputs[idx % sizeInputs];
 	}
 }
 
@@ -133,7 +182,9 @@ void Matrix::printMatrix() {
 
 Matrix Matrix::operator * (Matrix B) {
 	if (this->width != B.getHeight()) {
-		return Matrix(0, 0, NULL);
+		int error;
+		return Matrix(0, 0, &error);
+		printf("Error ocurred\n");
 	}
 
 	int error = cudaSuccess;
@@ -144,7 +195,8 @@ Matrix Matrix::operator * (Matrix B) {
 	this->copyMatrixToDevice();
 	B.copyMatrixToDevice();
 
-	multplyMatricesAndActivate <<<B.getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (this->dataDevice, B.dataDevice, result.dataDevice, this->getWidth(), B.getWidth(), this->getHeight(), B.getHeight(), STEP_FUNCTION);
+	multplyMatrices <<<B.getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (this->dataDevice, B.dataDevice, result.dataDevice, this->getWidth(), B.getWidth(), this->getHeight(), B.getHeight());
+	activateMatrices <<<B.getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (result.dataDevice, result.getWidth(), result.getHeight(), SIGMOID_FUNCTION);
 
 	result.copyMatrixToHost();
 
@@ -152,4 +204,87 @@ Matrix Matrix::operator * (Matrix B) {
 	std::cout << "Ticker: " << ticker << std::endl;
 
 	return result;
+}
+
+Matrix Matrix::operator - (Matrix B) {
+	if (this->width != B.getWidth() || this->height != B.getHeight()) {
+		int error;
+		return Matrix(0, 0, &error);
+		printf("Error ocurred\n");
+	}
+
+	int error = cudaSuccess;
+	Matrix result = Matrix(B.getWidth(), this->getHeight(), &error, 0);
+
+	long ticker = clock();
+
+	this->copyMatrixToDevice();
+	B.copyMatrixToDevice();
+
+	substractMatrices <<<B.getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (this->dataDevice, B.dataDevice, result.dataDevice, this->getWidth(), this->getHeight());
+
+	result.copyMatrixToHost();
+
+	return result;
+}
+
+Matrix Matrix::operator + (Matrix B) {
+	if (this->width != B.getWidth() || this->height != B.getHeight()) {
+		int error;
+		return Matrix(0, 0, &error);
+		printf("Error ocurred\n");
+	}
+
+	int error = cudaSuccess;
+	Matrix result = Matrix(B.getWidth(), this->getHeight(), &error, 0);
+
+	long ticker = clock();
+
+	this->copyMatrixToDevice();
+	B.copyMatrixToDevice();
+
+	addMatrices << <B.getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >> > (this->dataDevice, B.dataDevice, result.dataDevice, this->getWidth(), this->getHeight());
+
+	result.copyMatrixToHost();
+
+	return result;
+}
+
+void Matrix::multiplyWithDerivateMatrix(Matrix* errorSignal, int activationFunction) {
+	if(this->height != errorSignal->getHeight()) {
+		int error;
+		printf("Error ocurred\n");
+	}
+
+	int error = cudaSuccess;
+
+	this->copyMatrixToDevice();
+	errorSignal->copyMatrixToDevice();
+
+	multiplyWithDerivate <<<errorSignal->getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (this->dataDevice, errorSignal->dataDevice, this->getHeight(), activationFunction);
+
+	errorSignal->copyMatrixToHost();
+}
+
+void Matrix::calculateNewWeightsMatrix(Matrix* Inputs, Matrix* Error, float learnRate) {
+	if (this->height != Error->getHeight() || this->width != Inputs->getHeight()) {
+		int error;
+		printf("Error ocurred\n");
+	}
+
+	int error = cudaSuccess;
+
+	Error->copyMatrixToDevice();
+	Inputs->copyMatrixToDevice();
+	printf("\n");
+	Error->printMatrix();
+	printf("\n");
+	Inputs->printMatrix();
+	printf("\n");
+	this->printMatrix();
+
+
+	calculateNewWeights <<<this->getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (this->dataDevice, Error->dataDevice, Inputs->dataDevice, this->getHeight(), this->getWidth(), learnRate);
+
+	this->copyMatrixToHost();
 }
