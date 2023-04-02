@@ -58,3 +58,27 @@ void Network::printNetwork() {
 		layer->Outputs.printMatrix();
 	}
 }
+
+void Network::Backpropogation(float learnRate, Matrix Target) {
+	this->Target = Target;
+	this->learnRate = learnRate;
+	
+	layers[layers.size() - 1]->PreviousErrorSignal = &Target;
+
+	calcErrorSignal();
+	calcNewWeights();
+}
+
+void Network::calcErrorSignal() {
+	for (int i = layers.size() - 1; i >= 0; i--)
+	{
+		layers[i]->calculatErrorSignal();
+	}
+}
+
+void Network::calcNewWeights() {
+	for (int i = layers.size() - 1; i >= 0; i--)
+	{
+		layers[i]->calculateNewWeights(learnRate);
+	}
+}

@@ -20,7 +20,7 @@ void Layer::forward() {
 }
 
 void Layer::calculatErrorSignal() {
-	/*
+	//*
 	printf("\nPreviousErrorSignalFunction:\n");
 	PreviousErrorSignal->printMatrix(); 
 	printf("\nOutputs:\n");

@@ -8,6 +8,8 @@ private:
 public:
 	std::vector<Layer*> layers;
 	Matrix Inputs;
+	Matrix Target;
+	float learnRate;
 
 	Network(int sizeInputs);
 	void deleteNetwork();
@@ -17,4 +19,8 @@ public:
 	int forward();
 	Matrix* getNetworkOutput();
 	void printNetwork();
+
+	void Backpropogation(float learnRate, Matrix Target);
+	void calcErrorSignal();
+	void calcNewWeights();
 };

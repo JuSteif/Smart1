@@ -27,10 +27,14 @@ int main(int argc, char** argv) {
 	network.getNetworkOutput()->printMatrix();
 	//*/
 
+	int error;
+	Matrix Target = Matrix(1, 1, &error, 2, 1);
+	network.Backpropogation(0.5, Target);
+
 	network.deleteNetwork();
 
 
-	int error;
+	/*int error;
 	Matrix Ins(1, 2, &error, 2, 1);
 	Matrix Outs(1, 1, &error, 2, 1);
 	Layer layer = Layer(2, 1, true, &Ins, NULL, &Outs);
@@ -45,7 +49,7 @@ int main(int argc, char** argv) {
 
 	layer.calculateNewWeights(0.5);
 	printf("\n___________________________________\nnew Weights:\n");
-	layer.Weights.printMatrix();
+	layer.Weights.printMatrix();*/
 
 	return 0;
 }
