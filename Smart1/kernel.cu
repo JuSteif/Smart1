@@ -12,24 +12,26 @@ int main(int argc, char** argv) {
 	Network network(2);
 
 	network.addLayer(2);
-	network.addLayer(1);
+	network.addLayer(2);
 	
 	network.prepareNetwork();
 	
 	network.forward();
 	
-	/*
-	printf("\n____________________________________\nOutputs:\n");
-	network.getNetworkOutput()->printMatrix();
+	//*
+	
 	
 	printf("Inputs:\n");
 	network.Inputs.printMatrix();
 	printf("\nWeights:\n");
 	network.printNetwork();
+	printf("\n____________________________________\nOutputs:\n");
+	network.getNetworkOutput()->printMatrix();
+	printf("\n____________________________________\n\n");
 	//*/
 
 	int error;
-	Matrix Target = Matrix(1, 1, &error, 2, 1);
+	Matrix Target = Matrix(1, 2, &error, 2, 1);
 	network.Backpropogation(0.5, Target);
 
 

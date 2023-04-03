@@ -106,13 +106,13 @@ __global__ void calculateNewWeights(float* weights, float* Error, float* Inputs,
 	}
 }
 
-__global__ void multiplyAndSum(float* weights, float* errorSignal, float* previousErrorSignal, int sizeError, int sizePreviousError) {
+__global__ void multiplyAndSum(float* weights, float* previousErrorSignal, float* errorSignal, int sizeError, int sizePreviousError) {
 	int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
 	if (idx < sizeError) {
-		int sum = 0;
+		float sum = 0;
 		for (int i = 0; i < sizePreviousError; i++) {
-			sum += previousErrorSignal[0];// weights[sizeError * i + idx] * previousErrorSignal[i];
+			sum += weights[sizeError * i + idx] * previousErrorSignal[i];
 		}
 		errorSignal[idx] = sum;
 	}
@@ -310,19 +310,10 @@ void Matrix::multiplyAndSumMatrix(Matrix* weights, Matrix* previousErrorSignal) 
 
 	int error = cudaSuccess;
 
-	weights->dataHost[1] = 2;
-
 	weights->copyMatrixToDevice();
 	previousErrorSignal->copyMatrixToDevice();
-	printf("Previous ErrorSignal\n------------------------------------------------\n");
-	previousErrorSignal->printMatrix();
 
-	printf("ErrorSignal Größe %d\n", this->height);
-	printf("PreviousErrorSignal Größe %d\n", previousErrorSignal->getHeight());
-	printf("Weights x %d   y %d\n", weights->getWidth(), weights->getHeight());
-
-	multiplyAndSum <<<this->getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (weights->dataDevice, this->dataDevice, previousErrorSignal->dataDevice, this->getHeight(), previousErrorSignal->getHeight());
+	multiplyAndSum <<<this->getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (weights->dataDevice, previousErrorSignal->dataDevice, this->dataDevice, this->getHeight(), previousErrorSignal->getHeight());
 
 	this->copyMatrixToHost();
-	this->printMatrix();
 }
