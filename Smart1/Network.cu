@@ -73,6 +73,8 @@ void Network::calcErrorSignal() {
 	for (int i = layers.size() - 1; i >= 0; i--)
 	{
 		layers[i]->calculatErrorSignal();
+		printf("\n___________________________________\nError Signal %d:\n", i);
+		layers[i]->ErrorSignal.printMatrix();
 	}
 }
 
@@ -80,5 +82,7 @@ void Network::calcNewWeights() {
 	for (int i = layers.size() - 1; i >= 0; i--)
 	{
 		layers[i]->calculateNewWeights(learnRate);
+		printf("\n___________________________________\nnew Weights %d:\n", i);
+		layers[i]->Weights.printMatrix();
 	}
 }

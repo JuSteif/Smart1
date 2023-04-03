@@ -22,18 +22,24 @@ void Layer::forward() {
 void Layer::calculatErrorSignal() {
 	//*
 	printf("\nPreviousErrorSignalFunction:\n");
-	PreviousErrorSignal->printMatrix(); 
-	printf("\nOutputs:\n");
+	PreviousErrorSignal->printMatrix();
+	/*printf("\nOutputs:\n");
 	Outputs.printMatrix();
 	//*/
 
 	if (outputNeuron) {
 		ErrorSignal = Outputs - *PreviousErrorSignal;
+		printf("Last Layer\n");
 	}
 	else {
-		ErrorSignal = *PreviousWeights * *PreviousErrorSignal;
+		printf("\nPreviousWeights:\n");
+		PreviousWeights->printMatrix();
+
+		ErrorSignal.multiplyAndSumMatrix(PreviousWeights, PreviousErrorSignal);
+		//ErrorSignal = *PreviousWeights * *PreviousErrorSignal;
+		printf("Hidden Layer\n");
 	}
-	/*
+	//*
 	printf("\nErrorSignalFunctionAfter:\n");
 	ErrorSignal.printMatrix();
 	//*/

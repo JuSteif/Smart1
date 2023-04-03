@@ -20,6 +20,7 @@ __global__ void substractMatrices(float* A, float* B, float* C, int widthA, int 
 __global__ void addMatrices(float* A, float* B, float* C, int widthA, int heightA);
 __global__ void multiplyWithDerivate(float* outputs, float* errorSignal, int sizeOutputs, uint8_t activatioonFunction = SIGMOID_FUNCTION);
 __global__ void calculateNewWeights(float* weights, float* Error, float* Inputs, int sizeError, int sizeInputs, float learnRate);
+__global__ void multiplyAndSum(float* weights, float* errorSignal, float* previousErrorSignal, int sizeError, int sizePreviousError);
 
 class Matrix {
 private:
@@ -51,4 +52,5 @@ public:
 	Matrix operator + (Matrix B);
 	void multiplyWithDerivateMatrix(Matrix* errorSignal, int activationFunction = SIGMOID_FUNCTION);
 	void calculateNewWeightsMatrix(Matrix* Inputs, Matrix* Error, float learnRate);
+	void multiplyAndSumMatrix(Matrix* weights, Matrix* previousErrorSignal);
 };
