@@ -2,7 +2,7 @@
 
 Network::Network(int sizeInputs) {
 	int error;
-	Inputs = Matrix(1, sizeInputs, &error, 2, 1);
+	Inputs = Matrix(1, sizeInputs + 1, &error, 2, 1);
 }
 
 void Network::deleteNetwork() {
@@ -53,9 +53,11 @@ Matrix* Network::getNetworkOutput() {
 
 void Network::printNetwork() {
 	for (Layer* layer : layers) {
+		printf("Weights: width %d  height %d\n", layer->Weights.getWidth(), layer->Weights.getHeight());
 		layer->Weights.printMatrix();
-		printf("\n");
+		printf("\nOutputs: height %d\n", layer->Outputs.getHeight());
 		layer->Outputs.printMatrix();
+		printf("________________________\n");
 	}
 }
 

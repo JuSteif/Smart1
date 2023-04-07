@@ -27,8 +27,8 @@ private:
 	int width, height;
 	float* dataHost;
 
-	int copyMatrixToDevice();
-	int copyMatrixToHost();
+	int copyMatrixToDevice(int leftTopX, int leftTopY, int bottomRightX, int bottomRightY);
+	int copyMatrixToHost(int leftTopX, int leftTopY, int bottomRightX, int bottomRightY);
 public:
 	float* dataDevice;
 
@@ -53,4 +53,5 @@ public:
 	void multiplyWithDerivateMatrix(Matrix* errorSignal, int activationFunction = SIGMOID_FUNCTION);
 	void calculateNewWeightsMatrix(Matrix* Inputs, Matrix* Error, float learnRate);
 	void multiplyAndSumMatrix(Matrix* weights, Matrix* previousErrorSignal);
+	void Matrix::Forward(Matrix& A, Matrix& B, uint8_t activationFunction);
 };
