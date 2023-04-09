@@ -305,8 +305,8 @@ void Matrix::multiplyWithDerivateMatrix(Matrix* errorSignal, int activationFunct
 
 	int error = cudaSuccess;
 
-	printf("Eingabe\n");
-	this->printMatrix();
+	/*printf("Eingabe\n");
+	this->printMatrix();*/
 
 	this->copyMatrixToDevice(0, 0, this->getWidth() - 1, this->getHeight() - 2);
 	errorSignal->copyMatrixToDevice(0, 0, errorSignal->getWidth() - 1, errorSignal->getHeight() - 1);
@@ -326,12 +326,12 @@ void Matrix::calculateNewWeightsMatrix(Matrix* Inputs, Matrix* Error, float lear
 
 	Error->copyMatrixToDevice(0, 0, Error->getWidth() - 1, Error->getHeight() - 1);
 	Inputs->copyMatrixToDevice(0, 0, Inputs->getWidth() - 1, Inputs->getHeight() - 1);
-	printf("\n");
+	/*printf("\n");
 	Error->printMatrix();
 	printf("\n");
 	Inputs->printMatrix();
 	printf("\n");
-	this->printMatrix();
+	this->printMatrix();*/
 
 
 	calculateNewWeights <<<this->getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (this->dataDevice, Error->dataDevice, Inputs->dataDevice, this->getHeight(), this->getWidth(), learnRate);
