@@ -25,14 +25,14 @@ int main(int argc, char** argv) {
 	network.Inputs.printMatrix();
 	printf("\nWeights:\n");
 	network.printNetwork();
-	/*printf("\nOutputs:\n");
-	network.getNetworkOutput()->printMatrix();*/
-	printf("\n___________________________________________________________\n\n");
+	printf("\nOutputs:\n");
+	network.getNetworkOutput()->printMatrix();
+	printf("\n___________________________________________________________\n\n\n\n\n");
 	//*/
 
-	/*int error;
-	Matrix Target = Matrix(1, 2, &error, 2, 1);
-	network.Backpropogation(0.5, Target);*/
+	int error;
+	Matrix Target = Matrix(1, 1, &error, 2, 1);
+	network.Backpropogation(0.5, Target);
 
 
 	network.deleteNetwork();

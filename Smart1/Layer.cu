@@ -25,12 +25,10 @@ void Layer::calculatErrorSignal() {
 	//*
 	printf("\nPreviousErrorSignalFunction:\n");
 	PreviousErrorSignal->printMatrix();
-	/*printf("\nOutputs:\n");
-	Outputs.printMatrix();
-	//*/
 
 	if (outputNeuron) {
-		ErrorSignal = Outputs - *PreviousErrorSignal;
+		//ErrorSignal = Outputs - *PreviousErrorSignal;
+		ErrorSignal.SubstactTargetFromOutput(Outputs, *PreviousErrorSignal);
 		printf("Last Layer\n");
 	}
 	else {
@@ -41,10 +39,10 @@ void Layer::calculatErrorSignal() {
 		//ErrorSignal = *PreviousWeights * *PreviousErrorSignal;
 		printf("Hidden Layer\n");
 	}
-	//*
+	printf("Error Signal\n");
+	ErrorSignal.printMatrix();
 	printf("\nErrorSignalFunctionAfter:\n");
 	ErrorSignal.printMatrix();
-	//*/
 
 	Outputs.multiplyWithDerivateMatrix(&ErrorSignal, SIGMOID_FUNCTION);
 }

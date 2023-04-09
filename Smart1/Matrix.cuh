@@ -53,5 +53,6 @@ public:
 	void multiplyWithDerivateMatrix(Matrix* errorSignal, int activationFunction = SIGMOID_FUNCTION);
 	void calculateNewWeightsMatrix(Matrix* Inputs, Matrix* Error, float learnRate);
 	void multiplyAndSumMatrix(Matrix* weights, Matrix* previousErrorSignal);
-	void Matrix::Forward(Matrix& A, Matrix& B, uint8_t activationFunction);
+	void Forward(Matrix& A, Matrix& B, uint8_t activationFunction);
+	void SubstactTargetFromOutput(Matrix& A, Matrix& B);
 };

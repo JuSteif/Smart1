@@ -297,7 +297,7 @@ Matrix Matrix::operator + (Matrix B) {
 }
 
 void Matrix::multiplyWithDerivateMatrix(Matrix* errorSignal, int activationFunction) {
-	if(this->height != errorSignal->getHeight()) {
+	if(this->height != errorSignal->getHeight() + 1) {
 		int error;
 		printf("Error ocurred in multiply with Derivate\n");
 		printf("Output %d\tError%d", this->height, errorSignal->getHeight());
@@ -305,24 +305,27 @@ void Matrix::multiplyWithDerivateMatrix(Matrix* errorSignal, int activationFunct
 
 	int error = cudaSuccess;
 
-	this->copyMatrixToDevice(0, 0, this->getWidth() - 1, this->getHeight());
-	errorSignal->copyMatrixToDevice(0, 0, errorSignal->getWidth() - 1, errorSignal->getHeight());
+	printf("Eingabe\n");
+	this->printMatrix();
 
-	multiplyWithDerivate <<<errorSignal->getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (this->dataDevice, errorSignal->dataDevice, this->getHeight(), activationFunction);
+	this->copyMatrixToDevice(0, 0, this->getWidth() - 1, this->getHeight() - 2);
+	errorSignal->copyMatrixToDevice(0, 0, errorSignal->getWidth() - 1, errorSignal->getHeight() - 1);
 
-	errorSignal->copyMatrixToHost(0, 0, errorSignal->getWidth() - 1, errorSignal->getHeight());
+	multiplyWithDerivate <<<errorSignal->getWidth() * this->getHeight() - 1 / BLOCK_SIZE + 1, BLOCK_SIZE >>> (this->dataDevice, errorSignal->dataDevice, this->getHeight(), activationFunction);
+
+	errorSignal->copyMatrixToHost(0, 0, errorSignal->getWidth() - 1, errorSignal->getHeight() - 1);
 }
 
 void Matrix::calculateNewWeightsMatrix(Matrix* Inputs, Matrix* Error, float learnRate) {
 	if (this->height != Error->getHeight() || this->width != Inputs->getHeight()) {
 		int error;
-		printf("Error ocurred\n");
+		printf("Error ocurred in calculated Weights\n");
 	}
 
 	int error = cudaSuccess;
 
-	Error->copyMatrixToDevice(0, 0, Error->getWidth() - 1, Error->getHeight());
-	Inputs->copyMatrixToDevice(0, 0, Inputs->getWidth() - 1, Inputs->getHeight());
+	Error->copyMatrixToDevice(0, 0, Error->getWidth() - 1, Error->getHeight() - 1);
+	Inputs->copyMatrixToDevice(0, 0, Inputs->getWidth() - 1, Inputs->getHeight() - 1);
 	printf("\n");
 	Error->printMatrix();
 	printf("\n");
@@ -337,15 +340,15 @@ void Matrix::calculateNewWeightsMatrix(Matrix* Inputs, Matrix* Error, float lear
 }
 
 void Matrix::multiplyAndSumMatrix(Matrix* weights, Matrix* previousErrorSignal) {
-	if (this->height != weights->getWidth() || weights->getHeight() != previousErrorSignal->getHeight()) {
+	if (this->height + 1 != weights->getWidth() || weights->getHeight() != previousErrorSignal->getHeight()) {
 		int error;
-		printf("Error ocurred in Multiply and Sum\n");
+		printf("Error ocurred in Multiply and Sum heightPrevious %d heightError %d widthWeights %d heightWeights %d\n", previousErrorSignal->height, this->height, weights->width, weights->height);
 	}
 
 	int error = cudaSuccess;
 
-	weights->copyMatrixToDevice(0, 0, weights->getWidth() - 1, weights->getHeight());
-	previousErrorSignal->copyMatrixToDevice(0, 0, previousErrorSignal->getWidth() - 1, previousErrorSignal->getHeight());
+	weights->copyMatrixToDevice(0, 0, weights->getWidth() - 2, weights->getHeight() - 1);
+	previousErrorSignal->copyMatrixToDevice(0, 0, previousErrorSignal->getWidth() - 1, previousErrorSignal->getHeight() - 1);
 
 	multiplyAndSum <<<this->getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (weights->dataDevice, previousErrorSignal->dataDevice, this->dataDevice, this->getHeight(), previousErrorSignal->getHeight());
 
@@ -367,4 +370,19 @@ void Matrix::Forward(Matrix& Inputs, Matrix& Weights, uint8_t activationFunction
 	activateMatrices <<<Weights.getHeight() * Inputs.getWidth() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (this->dataDevice, this->getWidth(), this->getHeight() - 1, activationFunction);
 
 	this->copyMatrixToHost(0, 0, this->getWidth() - 1, this->getHeight() - 2);
+}
+
+void Matrix::SubstactTargetFromOutput(Matrix& A, Matrix& B){
+	if(A.getHeight() - 1 != B.getHeight()){
+		int error;
+		printf("Error ocurred in Matrixmultiplication A Height %d B Height %d\n", A.getHeight(), B.getHeight());
+		return;
+	}
+
+	A.copyMatrixToDevice(0, 0, A.getWidth() - 1, A.getHeight() - 1);
+	B.copyMatrixToDevice(0, 0, B.getWidth() - 1, B.getHeight() - 1);
+
+	substractMatrices <<<B.getWidth() * A.getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (A.dataDevice, B.dataDevice, this->dataDevice, this->getWidth(), this->getHeight());
+
+	this->copyMatrixToHost(0, 0, this->getWidth() - 1, this->getHeight() - 1);
 }
