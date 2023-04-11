@@ -2,7 +2,7 @@
 
 Layer::Layer(int sizeInput, int sizeOutput, bool outputNeuron, Matrix* Inputs, Matrix* PreviousWeights, Matrix* PreviousErrorSignal) : outputNeuron(outputNeuron), Inputs(Inputs), PreviousWeights(PreviousWeights), PreviousErrorSignal(PreviousErrorSignal) {
 	int error;
-	Weights = Matrix(sizeInput, sizeOutput, &error, 2, 1);
+	Weights = Matrix(sizeInput, sizeOutput, &error, 1);
 	if (error != cudaSuccess) return;
 	Outputs = Matrix(1, sizeOutput + 1, &error, 0);
 	if (error != cudaSuccess) return;

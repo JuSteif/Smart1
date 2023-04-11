@@ -2,7 +2,7 @@
 
 Network::Network(int sizeInputs) {
 	int error;
-	Inputs = Matrix(1, sizeInputs + 1, &error, 2, 1);
+	Inputs = Matrix(1, sizeInputs + 1, &error, 0);
 }
 
 void Network::deleteNetwork() {

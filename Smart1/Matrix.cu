@@ -180,7 +180,8 @@ Matrix::Matrix(int width, int height, int* errorStatus, uint8_t method, float se
 		srand(time(0));
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
-				dataHost[i * width + j] = (float)rand() / (float)rand();
+				dataHost[i * width + j] = ((float)rand() / (float)rand());
+				dataHost[i * width + j] -= (int)dataHost[i * width + j];
 			}
 		}
 	}
