@@ -57,6 +57,8 @@ void Network::printNetwork() {
 		layer->Weights.printMatrix();
 		printf("\nOutputs: height %d\n", layer->Outputs.getHeight());
 		layer->Outputs.printMatrix();
+		printf("\nErrorSignal: height %d\n", layer->ErrorSignal.getHeight());
+		layer->ErrorSignal.printMatrix();
 		printf("________________________\n");
 	}
 }

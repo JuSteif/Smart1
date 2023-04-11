@@ -32,11 +32,13 @@ int main(int argc, char** argv) {
 		for(int i = 0; i < 4; i++){
 			int i1 = i % 2;
 			int i2 = i / 2;
+			if (i1 == 0) i1 = -1;
+			if (i2 == 0) i2 = -1;
 			network.Inputs.setData(0, 0, i1);
 			network.Inputs.setData(0, 1, i2);
 
 			int r = 0;
-			if((i1 == 1 && i2 == 0) || (i1 == 0 && i2 == 1)){
+			if((i1 == 1 && i2 == -1) || (i1 == -1 && i2 == 1)){
 				r = 1;
 			}
 			network.forward();
@@ -45,15 +47,20 @@ int main(int argc, char** argv) {
 			Target.setData(0, 0, r);
 			network.Backpropogation(0.5, Target);
 
-			printf("i1: %d i2: %d r: %d\n", i1, i2, r);
+			/*printf("i1: %d i2: %d r: %d\n", i1, i2, r);
+			network.printNetwork();*/
 
-			if(network.getNetworkOutput()->getData(0, 0) != r){
+			printf("\n\n________________________________\nRound %d:\n", i);
+			printf("i1: %d i2: %d r: %d\n", i1, i2, r);
+			network.printNetwork();
+
+			if(round(network.getNetworkOutput()->getData(0, 0)) != r){
 				networkError = false;
 			}
 		}
+		/*char con;
+		scanf("%d", &con);*/
 	} 
-
-	network.printNetwork();
 
 	network.deleteNetwork();
 
