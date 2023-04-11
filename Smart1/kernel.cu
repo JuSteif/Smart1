@@ -10,6 +10,8 @@
 
 int main(int argc, char** argv) {
 
+	printf("XOR Test \n");
+
 	Network network(2);
 
 	network.addLayer(4);
