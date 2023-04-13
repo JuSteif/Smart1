@@ -47,13 +47,20 @@ int main(int argc, char** argv) {
 				r2 = 1;
 			}
 
-			network.Inputs.setData(0, 0, j1);
-			network.Inputs.setData(0, 1, j2);
+			//network.Inputs.setData(0, 0, j1);
+			//network.Inputs.setData(0, 1, j2);
+
+			float test2[2] = {j1, j2};
+			network.setInput(test2);
 
 			network.forward();
 			remember[j] = network.getNetworkOutput()->getData(0, 0);
 
-			if(round(network.getNetworkOutput()->getData(0, 0)) != r2){
+			//network.Inputs.printMatrix();
+			int size;
+			float* res = network.getOutputArray(&size);
+
+			if(round(res[0]) != r2){
 				networkError = false;
 			}
 		}
@@ -71,8 +78,9 @@ int main(int argc, char** argv) {
 		int i2 = i / 2;
 		if (i1 == 0) i1 = 0;
 		if (i2 == 0) i2 = 0;
-		network.Inputs.setData(0, 0, i1);
-		network.Inputs.setData(0, 1, i2);
+
+		float test[2] = {i1, i2};
+		network.setInput(test);
 
 		int r = 0;
 		if((i1 == 1 && i2 == 0) || (i1 == 0 && i2 == 1)){

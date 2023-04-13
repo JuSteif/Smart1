@@ -1,10 +1,11 @@
 #pragma once
 #include <vector>
+#include <stdlib.h>
 
 #include "Layer.h"
 
 /**
- * @brief main class for neural network
+ * @brief Main class for neural network
 */
 class Network {
 private:
@@ -90,4 +91,19 @@ public:
 	 * 
 	 */
 	void calcNewWeights();
+
+	/**
+	 * @brief Set the Input for the neural net
+	 * 
+	 * @param data Used for Input. Should have the exact same size as the determined input
+	 */
+	void setInput(float* data);
+
+	/**
+	 * @brief Get the Output of this network
+	 * 
+	 * @param size size of output
+	 * @return float* output array
+	 */
+	float* getOutputArray(int* size);
 };

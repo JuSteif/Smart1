@@ -91,17 +91,6 @@ __global__ void multiplyAndSum(float* weights, float* previousErrorSignal, float
 class Matrix {
 private:
 	/**
-	 * @brief height and width of current matrix
-	 * 
-	 */
-	int width, height;
-	/**
-	 * @brief Data stored on normal RAM
-	 * 
-	 */
-	float* dataHost;
-
-	/**
 	 * @brief Copies part of Matrix from Host to device. The part is defiend by a rectangle wich is determined by two points
 	 * 
 	 * @param leftTopX X-Coordinate from first point
@@ -122,6 +111,16 @@ private:
 	 */
 	int copyMatrixToHost(int leftTopX, int leftTopY, int bottomRightX, int bottomRightY);
 public:
+	/**
+	 * @brief height and width of current matrix
+	 * 
+	 */
+	int width, height;
+	/**
+	 * @brief Data stored on normal RAM
+	 * 
+	 */
+	float* dataHost;
 	/**
 	 * @brief Data stored on GPU
 	 * 

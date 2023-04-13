@@ -3,6 +3,7 @@
 Network::Network(int sizeInputs) {
 	int error;
 	Inputs = Matrix(1, sizeInputs + 1, &error, 0);
+	Inputs.setData(Inputs.getWidth() - 1, Inputs.getHeight() - 1, 1);
 }
 
 void Network::deleteNetwork() {
@@ -89,4 +90,13 @@ void Network::calcNewWeights() {
 		/*printf("\n___________________________________\nnew Weights %d:\n", i);
 		layers[i]->Weights.printMatrix();*/
 	}
+}
+
+void Network::setInput(float* data){
+	memcpy(Inputs.dataHost, data, sizeof(float) * (Inputs.getHeight() - 1));
+}
+
+float* Network::getOutputArray(int* size){
+	*size = this->getNetworkOutput()->getHeight() - 1;
+	return this->getNetworkOutput()->dataHost;
 }
