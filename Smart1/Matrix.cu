@@ -151,12 +151,32 @@ int Matrix::copyMatrixToHost(int leftTopX, int leftTopY, int bottomRightX, int b
 	int error = cudaSuccess;
 	for (int i = leftTopY; i <= bottomRightY; i++) {
 		//printf(" i: %d %d %d %d %d\n", i, newWidth * (i - leftTopY), i * width + leftTopX, newWidth, newWidth * newHeight);
-		cudaMemcpy(&dataHost[i * width + leftTopX], &dataDevice[newWidth * (i - leftTopY)], (newWidth) * sizeof(float), cudaMemcpyDeviceToHost);
+		error = cudaMemcpy(&dataHost[i * width + leftTopX], &dataDevice[newWidth * (i - leftTopY)], (newWidth) * sizeof(float), cudaMemcpyDeviceToHost);
 		if (error != cudaSuccess) {
 			printf("error while copying\n");
 			return error;
 		}
 	}
+	return error;
+}
+
+int Matrix::copyMatrixToDeviceVector(int top, int bottom) {
+	int error;
+	cudaFree(dataDevice);
+	error = cudaMalloc(&dataDevice, (bottom - top + 1) * sizeof(float));
+	if (error != cudaSuccess) {
+		printf("error while allocating\n");
+		return error;
+	}
+
+	error = cudaMemcpy(dataDevice, &dataHost[top], (bottom - top + 1) * sizeof(float), cudaMemcpyHostToDevice);
+	return error;
+}
+
+int Matrix::copyMatrixToHostVector(int top, int bottom) {
+	int error;
+
+	error = cudaMemcpy(&dataHost[top], dataDevice, (bottom - top + 1) * sizeof(float), cudaMemcpyDeviceToHost);
 	return error;
 }
 
@@ -309,12 +329,12 @@ void Matrix::multiplyWithDerivateMatrix(Matrix* errorSignal, int activationFunct
 	/*printf("Eingabe\n");
 	this->printMatrix();*/
 
-	this->copyMatrixToDevice(0, 0, this->getWidth() - 1, this->getHeight() - 2);
-	errorSignal->copyMatrixToDevice(0, 0, errorSignal->getWidth() - 1, errorSignal->getHeight() - 1);
+	this->copyMatrixToDeviceVector(0, this->getHeight() - 2);
+	errorSignal->copyMatrixToDeviceVector(0, errorSignal->getHeight() - 1);
 
 	multiplyWithDerivate <<<errorSignal->getWidth() * this->getHeight() - 1 / BLOCK_SIZE + 1, BLOCK_SIZE >>> (this->dataDevice, errorSignal->dataDevice, this->getHeight(), activationFunction);
 
-	errorSignal->copyMatrixToHost(0, 0, errorSignal->getWidth() - 1, errorSignal->getHeight() - 1);
+	errorSignal->copyMatrixToHostVector(0, errorSignal->getHeight() - 1);
 }
 
 void Matrix::calculateNewWeightsMatrix(Matrix* Inputs, Matrix* Error, float learnRate) {
@@ -325,8 +345,8 @@ void Matrix::calculateNewWeightsMatrix(Matrix* Inputs, Matrix* Error, float lear
 
 	int error = cudaSuccess;
 
-	Error->copyMatrixToDevice(0, 0, Error->getWidth() - 1, Error->getHeight() - 1);
-	Inputs->copyMatrixToDevice(0, 0, Inputs->getWidth() - 1, Inputs->getHeight() - 1);
+	Error->copyMatrixToDeviceVector(0, Error->getHeight() - 1);
+	Inputs->copyMatrixToDeviceVector(0, Inputs->getHeight() - 1);
 	/*printf("\n");
 	Error->printMatrix();
 	printf("\n");
@@ -349,11 +369,11 @@ void Matrix::multiplyAndSumMatrix(Matrix* weights, Matrix* previousErrorSignal) 
 	int error = cudaSuccess;
 
 	weights->copyMatrixToDevice(0, 0, weights->getWidth() - 2, weights->getHeight() - 1);
-	previousErrorSignal->copyMatrixToDevice(0, 0, previousErrorSignal->getWidth() - 1, previousErrorSignal->getHeight() - 1);
+	previousErrorSignal->copyMatrixToDeviceVector(0, previousErrorSignal->getHeight() - 1);
 
 	multiplyAndSum <<<this->getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (weights->dataDevice, previousErrorSignal->dataDevice, this->dataDevice, this->getHeight(), previousErrorSignal->getHeight());
 
-	this->copyMatrixToHost(0, 0, this->getWidth() - 1, this->getHeight() - 1);
+	this->copyMatrixToHostVector(0, this->getHeight() - 1);
 }
 
 void Matrix::Forward(Matrix& Inputs, Matrix& Weights, uint8_t activationFunction) {
@@ -364,13 +384,13 @@ void Matrix::Forward(Matrix& Inputs, Matrix& Weights, uint8_t activationFunction
 	}
 	//printf("WeightsWidth %d AHeight %d\n", Weights.getWidth(), Inputs.getHeight());
 
-	Inputs.copyMatrixToDevice(0, 0, Inputs.getWidth() - 1, Inputs.getHeight() - 1);
+	Inputs.copyMatrixToDeviceVector(0, Inputs.getHeight() - 1);
 	Weights.copyMatrixToDevice(0, 0, Weights.getWidth() - 1, Weights.getHeight() - 1);
 
 	multplyMatrices <<<Weights.getHeight() * Inputs.getWidth() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (Weights.dataDevice, Inputs.dataDevice, this->dataDevice, Weights.getWidth(), Inputs.getWidth(), Weights.getHeight(), Inputs.getHeight());
 	activateMatrices <<<Weights.getHeight() * Inputs.getWidth() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (this->dataDevice, this->getWidth(), this->getHeight() - 1, activationFunction);
 
-	this->copyMatrixToHost(0, 0, this->getWidth() - 1, this->getHeight() - 2);
+	this->copyMatrixToHostVector(0, this->getHeight() - 2);
 }
 
 void Matrix::SubstactTargetFromOutput(Matrix& A, Matrix& B){

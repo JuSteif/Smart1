@@ -110,6 +110,10 @@ private:
 	 * @return return cudaSuccess if coopying was successful
 	 */
 	int copyMatrixToHost(int leftTopX, int leftTopY, int bottomRightX, int bottomRightY);
+
+	int copyMatrixToDeviceVector(int top, int bottom);
+
+	int copyMatrixToHostVector(int top, int bottom);
 public:
 	/**
 	 * @brief height and width of current matrix
