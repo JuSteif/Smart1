@@ -1,6 +1,6 @@
 #include "Layer.h"
 
-Layer::Layer(int sizeInput, int sizeOutput, bool outputNeuron, Matrix* Inputs, Matrix* PreviousWeights, Matrix* PreviousErrorSignal) : outputNeuron(outputNeuron), Inputs(Inputs), PreviousWeights(PreviousWeights), PreviousErrorSignal(PreviousErrorSignal) {
+Layer::Layer(int sizeInput, int sizeOutput, bool outputNeuron, Matrix* Inputs, Matrix* PreviousWeights, Matrix* PreviousErrorSignal, int activationFunction) : outputNeuron(outputNeuron), Inputs(Inputs), PreviousWeights(PreviousWeights), PreviousErrorSignal(PreviousErrorSignal), activationFunction(activationFunction) {
 	int error;
 	Weights = Matrix(sizeInput, sizeOutput, &error, 1);
 	if (error != cudaSuccess) return;
@@ -18,7 +18,7 @@ void Layer::deleteLayer() {
 
 void Layer::forward() {
 	//Outputs = Weights * *Inputs;
-	Outputs.Forward(*Inputs, Weights, SIGMOID_FUNCTION);
+	Outputs.Forward(*Inputs, Weights, activationFunction);
 }
 
 void Layer::calculatErrorSignal() {
@@ -45,7 +45,7 @@ void Layer::calculatErrorSignal() {
 	printf("\nErrorSignalFunctionAfter:\n");
 	ErrorSignal.printMatrix();*/
 
-	Outputs.multiplyWithDerivateMatrix(&ErrorSignal, SIGMOID_FUNCTION);
+	Outputs.multiplyWithDerivateMatrix(&ErrorSignal, activationFunction);
 }
 
 void Layer::calculateNewWeights(float learnRate) {

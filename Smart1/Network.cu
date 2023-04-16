@@ -14,7 +14,7 @@ void Network::deleteNetwork() {
 	}
 }
 
-int Network::addLayer(int sizeOutputs) {
+int Network::addLayer(int sizeOutputs, int activationFunction) {
 	Matrix* mat;
 	if (layers.size() < 1) {
 		mat = &Inputs;
@@ -23,7 +23,7 @@ int Network::addLayer(int sizeOutputs) {
 		mat = &(layers[layers.size() - 1]->Outputs);
 	}
 
-	Layer* layer = new Layer(mat->getHeight(), sizeOutputs, false, mat, NULL, NULL);
+	Layer* layer = new Layer(mat->getHeight(), sizeOutputs, false, mat, NULL, NULL, activationFunction);
 	layers.push_back(layer);
 
 	return 0;
@@ -94,6 +94,11 @@ void Network::calcNewWeights() {
 
 void Network::setInput(float* data){
 	memcpy(Inputs.dataHost, data, sizeof(float) * (Inputs.getHeight() - 1));
+
+	/*Inputs.copyMatrixToDevice(0, InputsHeight.getHeight() - 2);
+	activateMatrices <<<Inputs.getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (Inputs.dataDevice, Inputs.getWidth(), Inputs.getHeight() - 1, activationFunction);
+	Inputs.copyMatrixToHost(0, InputsHeight.getHeight() - 2);
+	//*/
 }
 
 float* Network::getOutputArray(int* size){

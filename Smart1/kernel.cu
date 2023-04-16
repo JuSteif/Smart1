@@ -14,8 +14,8 @@ int main(int argc, char** argv) {
 
 	Network network(2);
 
-	network.addLayer(4);
-	network.addLayer(1);
+	network.addLayer(4, SIGMOID_FUNCTION);
+	network.addLayer(1, SIGMOID_FUNCTION);
 	
 	network.prepareNetwork();
 	srand(time(0));
@@ -56,7 +56,6 @@ int main(int argc, char** argv) {
 			network.forward();
 			remember[j] = network.getNetworkOutput()->getData(0, 0);
 
-			//network.Inputs.printMatrix();
 			int size;
 			float* res = network.getOutputArray(&size);
 
@@ -101,6 +100,11 @@ int main(int argc, char** argv) {
 
 		/*char con;
 		scanf("%d", &con);*/
+
+		/*network.Inputs.printMatrix();
+		printf("\n\n");
+		networkError = true;*/
+
 	} 
 
 	network.deleteNetwork();

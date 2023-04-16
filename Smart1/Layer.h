@@ -14,6 +14,11 @@ public:
 	 */
 	bool outputNeuron;
 	/**
+	 * @brief Determines the activation function that will be used
+	 * 
+	 */
+	int activationFunction;
+	/**
 	 * @brief Weights within the layer
 	 * 
 	 */
@@ -55,8 +60,9 @@ public:
 	 * @param Inputs Inputs for the new layer
 	 * @param PreviousWeights Weights of the next layer
 	 * @param PreviousErrorSignal Errorsignal from the next layer
+	 * @param activationFunction Determines the activation function that will be used
 	 */
-	Layer(int sizeInput, int sizeOutput, bool outputNeuron, Matrix* Inputs, Matrix* PreviousWeights, Matrix* PreviousErrorSignal);
+	Layer(int sizeInput, int sizeOutput, bool outputNeuron, Matrix* Inputs, Matrix* PreviousWeights, Matrix* PreviousErrorSignal, int activationFunction);
 	/**
 	 * @brief deletes the current layer
 	 * 

@@ -357,7 +357,7 @@ void Matrix::calculateNewWeightsMatrix(Matrix* Inputs, Matrix* Error, float lear
 
 	calculateNewWeights <<<this->getWidth() * this->getHeight() / BLOCK_SIZE + 1, BLOCK_SIZE >>> (this->dataDevice, Error->dataDevice, Inputs->dataDevice, this->getHeight(), this->getWidth(), learnRate);
 
-	this->copyMatrixToHost(0, 0, this->getWidth() - 1, this->getHeight());
+	this->copyMatrixToHost(0, 0, this->getWidth() - 1, this->getHeight() - 1);
 }
 
 void Matrix::multiplyAndSumMatrix(Matrix* weights, Matrix* previousErrorSignal) {

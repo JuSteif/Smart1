@@ -110,9 +110,21 @@ private:
 	 * @return return cudaSuccess if coopying was successful
 	 */
 	int copyMatrixToHost(int leftTopX, int leftTopY, int bottomRightX, int bottomRightY);
-
+	/**
+	 * @brief Copies part of vector from Host to Device. The part is defiend by top and bottom index
+	 * 
+	 * @param top top index of vector
+	 * @param bottom bottom indx of vector
+	 * @return int if copiyng was successful, this function returns cudaSuccess
+	 */
 	int copyMatrixToDeviceVector(int top, int bottom);
-
+	/**
+	 * @brief Copies part of vector from device to host. The part is defiend by top and bottom index
+	 * 
+	 * @param top top index of vector
+	 * @param bottom bottom indx of vector
+	 * @return int if copiyng was successful, this function returns cudaSuccess
+	 */
 	int copyMatrixToHostVector(int top, int bottom);
 public:
 	/**
