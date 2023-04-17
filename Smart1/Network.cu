@@ -31,6 +31,8 @@ int Network::addLayer(int sizeOutputs, int activationFunction) {
 
 int Network::prepareNetwork() {
 	layers[layers.size() - 1]->outputNeuron = true;
+	int error;
+	Target = Matrix(1, layers[layers.size() - 1]->Outputs.getHeight() - 1, &error, 0);
 
 	for (int i = layers.size() - 2; i >= 0; i--) {
 		layers[i]->PreviousErrorSignal = &(layers[i + 1]->ErrorSignal);
@@ -64,8 +66,7 @@ void Network::printNetwork() {
 	}
 }
 
-void Network::Backpropogation(float learnRate, Matrix Target) {
-	this->Target = Target;
+void Network::Backpropogation(float learnRate) {
 	this->learnRate = learnRate;
 	
 	layers[layers.size() - 1]->PreviousErrorSignal = &Target;
@@ -104,4 +105,8 @@ void Network::setInput(float* data){
 float* Network::getOutputArray(int* size){
 	*size = this->getNetworkOutput()->getHeight() - 1;
 	return this->getNetworkOutput()->dataHost;
+}
+
+void Network::setTarget(float* targetData) {
+	memcpy(Target.dataHost, targetData, sizeof(float) * (Target.getHeight()));
 }

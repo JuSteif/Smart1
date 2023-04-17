@@ -79,9 +79,8 @@ public:
 	 * @brief Performs backpropogation for complete network on one example
 	 * 
 	 * @param learnRate Determines how fast this network learns
-	 * @param Target Sets the desired output for this network
 	 */
-	void Backpropogation(float learnRate, Matrix Target);
+	void Backpropogation(float learnRate);
 	/**
 	 * @brief Calculates all error signals for complete network
 	 * 

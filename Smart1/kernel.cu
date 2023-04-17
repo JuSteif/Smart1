@@ -81,15 +81,16 @@ int main(int argc, char** argv) {
 		float test[2] = {i1, i2};
 		network.setInput(test);
 
-		int r = 0;
+		float r = 0;
 		if((i1 == 1 && i2 == 0) || (i1 == 0 && i2 == 1)){
 			r = 1;
 		}
 		network.forward();
-		int error;
+		/*int error;
 		Matrix Target = Matrix(1, 1, &error, 0);
-		Target.setData(0, 0, r);
-		network.Backpropogation(0.05, Target);
+		Target.setData(0, 0, r);*/
+		network.setTarget(&r);
+		network.Backpropogation(0.05);
 
 		/*printf("i1: %d i2: %d r: %d\n", i1, i2, r);
 		network.printNetwork();*/
