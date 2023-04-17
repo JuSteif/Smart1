@@ -107,4 +107,11 @@ public:
 	 * @return float* output array
 	 */
 	float* getOutputArray(int* size);
+
+	/**
+	 * @brief Set the Target for current network run
+	 * 
+	 * @param targetData Determines the data for correct output, wich is used by backpropogation
+	 */
+	void setTarget(float* targetData);
 };
