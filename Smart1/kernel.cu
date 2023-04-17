@@ -14,8 +14,8 @@ int main(int argc, char** argv) {
 
 	Network network(2);
 
-	network.addLayer(4, SIGMOID_FUNCTION);
-	network.addLayer(1, SIGMOID_FUNCTION);
+	network.addLayer(2, STEP_FUNCTION);
+	network.addLayer(1, STEP_FUNCTION);
 	
 	network.prepareNetwork();
 	srand(time(0));
@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 		int error;
 		Matrix Target = Matrix(1, 1, &error, 0);
 		Target.setData(0, 0, r);
-		network.Backpropogation(0.5, Target);
+		network.Backpropogation(0.05, Target);
 
 		/*printf("i1: %d i2: %d r: %d\n", i1, i2, r);
 		network.printNetwork();*/
