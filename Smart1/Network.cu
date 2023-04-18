@@ -149,3 +149,16 @@ void Network::safeNetwork(char* path) {
 
 	file.close();
 }
+
+Network::Network(char* path){
+	std::ifstream file;
+	file.open(path, std::ios::binary);
+
+	if (!file.is_open()) {
+		printf("Can`t open file");
+		return;
+	}
+
+	int netSize;
+	file.read((char*)&netSize, sizeof(netSize));
+}

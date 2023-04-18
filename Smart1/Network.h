@@ -5,7 +5,6 @@
 #include <string.h>
 #include <iostream>
 #include <fstream>
-#include <String>
 
 #include "Layer.h"
 
@@ -42,6 +41,13 @@ public:
 	 * @param sizeInputs size of inputs
 	 */
 	Network(int sizeInputs);
+	/**
+	 * @brief Construct a new Network object
+	 * 
+	 * @param path Path to network file
+	 */
+	Network(char* path);
+
 	/**
 	 * @brief deletes complete network and all it`s layers
 	 * 
@@ -119,5 +125,10 @@ public:
 	 */
 	void setTarget(float* targetData);
 
+	/**
+	 * @brief Safes the weights of this network in a .smart file
+	 * 
+	 * @param path Path to file without .smart
+	 */
 	void safeNetwork(char* path);
 };

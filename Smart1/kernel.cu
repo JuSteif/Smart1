@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
 		network.printNetwork();
 
 	} 
-	network.safeNetwork("C:\\Users\\seife\\OneDrive\\Desktop\\KI\\weights");
+	network.safeNetwork("weights");
 
 	network.deleteNetwork();
 
