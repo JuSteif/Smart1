@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
 
 	Network network(2);
 
-	network.addLayer(2, STEP_FUNCTION);
+	network.addLayer(4, STEP_FUNCTION);
 	network.addLayer(1, STEP_FUNCTION);
 	
 	network.prepareNetwork();
@@ -84,7 +84,12 @@ int main(int argc, char** argv) {
 		network.printNetwork();
 
 	} 
-	network.safeNetwork("weights");
+	network.safeNetwork("C:\\Users\\seife\\OneDrive\\Desktop\\KI\\weights");
+	Network network2 = Network("C:\\Users\\seife\\OneDrive\\Desktop\\KI\\weights.smart");
+	printf("\n\n\n");
+	network.printNetwork();
+	printf("_______________");
+	network2.printNetwork();
 
 	network.deleteNetwork();
 

@@ -136,11 +136,14 @@ void Network::safeNetwork(char* path) {
 		int outputsSize = layers[i]->Outputs.getHeight();
 		file.write((char*)&outputsSize, sizeof(outputsSize));
 		sizesNetwork.push_back(outputsSize);
+		int rem = layers[i]->activationFunction;
+		file.write((char*)&rem, sizeof(rem));
 	}
 
-	for (int i = 0; i < netSize - 1; i++) {
-		for (int j = 0; j < sizesNetwork[i] * sizesNetwork[i + 1]; j++) {
+	for (int i = 0; i < layers.size(); i++) {
+		for (int j = 0; j < layers[i]->Weights.getHeight() * layers[i]->Weights.getWidth(); j++) {
 			float rem = layers[i]->Weights.dataHost[j];
+			printf("%f\n", rem);
 			file.write((char*)&rem, sizeof(rem));
 		}
 	}
@@ -161,4 +164,28 @@ Network::Network(char* path){
 
 	int netSize;
 	file.read((char*)&netSize, sizeof(netSize));
+	
+	int inputsSize;
+	file.read((char*)&inputsSize, sizeof(inputsSize));
+	printf("%d\n", inputsSize);
+	int error;
+	Inputs = Matrix(1, inputsSize, &error, 0);
+	Inputs.setData(Inputs.getWidth() - 1, Inputs.getHeight() - 1, 1);
+
+	for (int i = 0; i < netSize; i++) {
+		int outputsSize;
+		file.read((char*)&outputsSize, sizeof(outputsSize));
+		printf("%d\n", outputsSize);
+		int aF;
+		file.read((char*)&aF, sizeof(aF));
+		addLayer(outputsSize - 1, aF);
+	}
+
+	for (int i = 0; i < layers.size(); i++) {
+		for (int j = 0; j < layers[i]->Weights.getHeight() * layers[i]->Weights.getWidth(); j++) {
+			file.read((char*)&(layers[i]->Weights.dataHost[j]), sizeof(layers[i]->Weights.dataHost[j]));
+		}
+	}
+
+	prepareNetwork();
 }
