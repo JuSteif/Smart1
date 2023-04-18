@@ -14,21 +14,11 @@ int main(int argc, char** argv) {
 
 	Network network(2);
 
-	network.addLayer(2, STEP_FUNCTION);
+	network.addLayer(4, STEP_FUNCTION);
 	network.addLayer(1, STEP_FUNCTION);
 	
 	network.prepareNetwork();
 	srand(time(0));
-	
-	/*
-	printf("Inputs:\n");
-	network.Inputs.printMatrix();
-	printf("\nWeights:\n");
-	network.printNetwork();
-	printf("\nOutputs:\n");
-	network.getNetworkOutput()->printMatrix();
-	printf("\n___________________________________________________________\n\n\n\n\n");
-	//*/
 
 	bool networkError = false;
 	int count = 0;
@@ -46,9 +36,6 @@ int main(int argc, char** argv) {
 			if((j1 == 1 && j2 == 0) || (j1 == 0 && j2 == 1)){
 				r2 = 1;
 			}
-
-			//network.Inputs.setData(0, 0, j1);
-			//network.Inputs.setData(0, 1, j2);
 
 			float test2[2] = {j1, j2};
 			network.setInput(test2);
@@ -86,9 +73,6 @@ int main(int argc, char** argv) {
 			r = 1;
 		}
 		network.forward();
-		/*int error;
-		Matrix Target = Matrix(1, 1, &error, 0);
-		Target.setData(0, 0, r);*/
 		network.setTarget(&r);
 		network.Backpropogation(0.05);
 
@@ -98,13 +82,6 @@ int main(int argc, char** argv) {
 		printf("\n\n________________________________\nRound %d:\n", i);
 		printf("i %d i1: %d i2: %d r: %d count %d\n", i, i1, i2, r, count);
 		network.printNetwork();
-
-		/*char con;
-		scanf("%d", &con);*/
-
-		/*network.Inputs.printMatrix();
-		printf("\n\n");
-		networkError = true;*/
 
 	} 
 
