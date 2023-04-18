@@ -1,6 +1,11 @@
 #pragma once
 #include <vector>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <iostream>
+#include <fstream>
+#include <String>
 
 #include "Layer.h"
 
@@ -113,4 +118,6 @@ public:
 	 * @param targetData Determines the data for correct output, wich is used by backpropogation
 	 */
 	void setTarget(float* targetData);
+
+	void safeNetwork(char* path);
 };

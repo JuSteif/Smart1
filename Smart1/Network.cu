@@ -1,5 +1,7 @@
 ﻿#include "Network.h"
 
+
+
 Network::Network(int sizeInputs) {
 	int error;
 	Inputs = Matrix(1, sizeInputs + 1, &error, 0);
@@ -109,4 +111,41 @@ float* Network::getOutputArray(int* size){
 
 void Network::setTarget(float* targetData) {
 	memcpy(Target.dataHost, targetData, sizeof(float) * (Target.getHeight()));
+}
+
+void Network::safeNetwork(char* path) {
+	std::vector<int> sizesNetwork;
+	
+	std::string fileName(path);
+	fileName.append(".smart");
+
+	std::ofstream file;
+	file.open(fileName, std::ios::binary);
+
+	if (!file.is_open()) {
+		printf("Can`t open file");
+		return;
+	}
+
+	int netSize = layers.size();
+	file.write((char*)&netSize, sizeof(netSize));
+	int inputsSize = Inputs.getHeight();
+	file.write((char*)&inputsSize, sizeof(inputsSize));
+	sizesNetwork.push_back(inputsSize);
+	for (int i = 0; i < netSize; i++) {
+		int outputsSize = layers[i]->Outputs.getHeight();
+		file.write((char*)&outputsSize, sizeof(outputsSize));
+		sizesNetwork.push_back(outputsSize);
+	}
+
+	for (int i = 0; i < netSize - 1; i++) {
+		for (int j = 0; j < sizesNetwork[i] * sizesNetwork[i + 1]; j++) {
+			float rem = layers[i]->Weights.dataHost[j];
+			file.write((char*)&rem, sizeof(rem));
+		}
+	}
+
+	
+
+	file.close();
 }
