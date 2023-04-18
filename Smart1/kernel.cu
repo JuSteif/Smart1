@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
 
 	Network network(2);
 
-	network.addLayer(4, STEP_FUNCTION);
+	network.addLayer(2, STEP_FUNCTION);
 	network.addLayer(1, STEP_FUNCTION);
 	
 	network.prepareNetwork();
@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
 		/*printf("i1: %d i2: %d r: %d\n", i1, i2, r);
 		network.printNetwork();*/
 
-		printf("\n\n________________________________\nRound %d:\n", i);
+		printf("\n\n________________________________\n\n");
 		printf("i %d i1: %d i2: %d r: %d count %d\n", i, i1, i2, r, count);
 		network.printNetwork();
 

@@ -45,7 +45,7 @@ public:
 
 	/**
 	 * @brief Adds new layer to network
-	 * 
+	 *
 	 * @param sizeOutputs size of outputs from this layer
 	 * @param activationFunction Determines the activation function that will be used
 	 * @return Success if creation was successful
